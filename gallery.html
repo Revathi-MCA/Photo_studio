@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fixed Background Example</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+  <!-- Navbar -->
+    <header class="navbar">
+        
+        <nav>
+            <a href="index.html" style="color: rgba(0, 0, 0, 0.758);">Home</a>
+            <a href="gallery.html" style="color: rgba(0, 0, 0, 0.758);">Gallery</a>
+            <a href="services.html" style="color: rgba(0, 0, 0, 0.758);">Services</a>
+            <a href="shop.html" style="color: rgba(0, 0, 0, 0.758);">Shop</a>
+            <a href="contact.html" style="color: rgba(0, 0, 0, 0.758);">Contact</a>
+        </nav>
+    </header>
+
+  <div class="gallery" id="gallery">
+    <div class="gallery-item big"><img src="./images/img1.jpg"></div>
+    <div class="gallery-item"><img src="./images/img2.jpg"></div>
+    <div class="gallery-item tall"><img src="./images/img3.jpg"></div>
+    <div class="gallery-item"><img src="./images/img4.jpg"></div>
+    <div class="gallery-item big"><img src="./images/img5.jpg"></div>
+    <div class="gallery-item tall"><img src="./images/img6.jpg"></div>
+    <div class="gallery-item"><img src="./images/img7.jpg"></div>
+    <div class="gallery-item"><img src="./images/img8.jpg"></div>
+    <div class="gallery-item tall"><img src="./images/img9.jpg"></div>
+    <div class="gallery-item big"><img src="./images/img10.jpg"></div>
+    <div class="gallery-item"><img src="./images/img11.jpg"></div>
+    <div class="gallery-item"><img src="./images/img12.jpg"></div>
+    <div class="gallery-item tall"><img src="./images/img13.jpg"></div>
+    <div class="gallery-item big"><img src="./images/img14.jpg"></div>
+    <div class="gallery-item"><img src="./images/img15.jpg"></div>
+    <div class="gallery-item"><img src="./images/img16.jpg"></div>
+    <div class="gallery-item tall"><img src="./images/img17.jpg"></div>
+    <div class="gallery-item big"><img src="./images/img18.jpg"></div>
+    <div class="gallery-item"><img src="./images/img19.jpg"></div>
+    <div class="gallery-item"><img src="./images/img20.jpg"></div>
+    <div class="gallery-item big"><img src="./images/img21.jpg"></div>
+    <div class="gallery-item"><img src="./images/img22.jpg"></div>
+    <div class="gallery-item tall"><img src="./images/img23.jpg"></div>
+    <div class="gallery-item"><img src="./images/img24.jpg"></div>
+    <div class="gallery-item big"><img src="./images/img25.jpg"></div>
+    <div class="gallery-item tall"><img src="./images/img26.jpg"></div>
+    <div class="gallery-item"><img src="./images/img27.jpg"></div>
+    <div class="gallery-item"><img src="./images/img28.jpg"></div>
+    <div class="gallery-item tall"><img src="./images/img29.jpg"></div>
+    <div class="gallery-item big"><img src="./images/img30.jpg"></div>
+    <div class="gallery-item"><img src="./images/img31.jpg"></div>
+    <div class="gallery-item"><img src="./images/img32.jpg"></div>
+    <div class="gallery-item tall"><img src="./images/img33.jpg"></div>
+    <div class="gallery-item big"><img src="./images/img34.jpg"></div>
+    <div class="gallery-item"><img src="./images/img35.jpg"></div>
+    <div class="gallery-item"><img src="./images/img36.jpg"></div>
+    <div class="gallery-item tall"><img src="./images/img37.jpg"></div>
+    <div class="gallery-item big"><img src="./images/img38.jpg"></div>
+    <div class="gallery-item"><img src="./images/img39.jpg"></div>
+    <div class="gallery-item"><img src="./images/img40.jpg"></div>
+  </div>
+  <div id="mongo-gallery"></div>
+
+  <!-- footer -->
+    <div class="footer">
+        <div class="icon">
+            <a href="https://www.facebook.com/yourpage"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/thoozhaa"><i class="fa-brands fa-instagram"></i></a>
+            <a href="mailto:vjaigrylls@gmail.com"><i class="fa-solid fa-envelope"></i></a>
+        </div> 
+        <div class="info">
+            <p>Thoozhaa Studio Photography</p>
+            <p>Main road, Karkathi, Thiruvarur - 612203</p>
+            <p>+91 8940048067</p>
+            <p>vjaigrylls@gmail.com</p>
+        </div>
+        <div><p>Freeze The Time</p></div>     
+    </div>
+
+  <script src="script.js"></script>
+
+  <script>
+  async function loadGallery() {
+    try {
+      const response = await fetch("http://localhost:5000/api/images");
+      const images = await response.json();
+      const gallery = document.getElementById("gallery");
+
+      // Insert each uploaded image at the top
+      images.forEach((img) => {
+        const layoutClasses = ["gallery-item", "gallery-item tall", "gallery-item big"];
+        const randomClass = layoutClasses[Math.floor(Math.random() * layoutClasses.length)];
+
+        const div = document.createElement("div");
+        div.className = randomClass;
+        const imgURL = `http://localhost:5000/${img.path.replace(/\\/g, '/')}`;
+        div.innerHTML = `<img src="${imgURL}" alt="Uploaded Photo">`;
+
+        // ✅ Add image to top
+        gallery.insertBefore(div, gallery.firstChild);
+      });
+
+      // Animation effect
+      setTimeout(() => {
+        document.querySelectorAll('.gallery-item').forEach((el, i) => {
+          setTimeout(() => el.classList.add('show'), i * 100);
+        });
+      }, 100);
+    } catch (error) {
+      console.error("Error loading gallery:", error);
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", loadGallery);
+
+
+</script>
+
+
+
+  </script>
+</body>
+</html>
+
+

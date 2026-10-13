@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navbar -->
+    <header class="navbar">
+        <img src="./images/big2.jpg" class="head-img" style="width: 100%; display: block;">
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="gallery.html">Gallery</a>
+            <a href="services.html">Services</a>
+            <a href="shop.html">Shop</a>
+            <a href="contact.html">Contact</a>
+            <a href="login.html" class="admin-btn">Admin</a>
+        </nav>
+    </header>
+    <p class="para">Welcome to our photography studio, where every moment is captured with creativity and care. We specialize in portraits, pre-wedding, and lifestyle photography that tells your unique story. Our professional team ensures a comfortable and fun experience for every client. Using the latest equipment and techniques, we bring out the best in every shot. Step into our studio and let us transform your special moments into timeless memories.</p>
+    <video src="./images/video.mp4" class="video" autoplay muted loop ></video>
+    <!-- feedback -->
+     <div class="feedback-container">
+        <div class="person">
+            <p>I visited the studio for a family photoshoot, and it was such a wonderful experience and team made everything so comfortable.</p>
+            
+        </div>
+        <div class="person">
+            <p>I had my pre-wedding shoot here, and the results were amazing and Every moment was captured beautifully thank you.</p>
+            
+        </div>
+        <div class="person">
+            <p>The studio did an incredible job with my portrait session. They guided me through poses and lighting i am very happy.</p>
+            
+        </div>
+        <div class="person">
+            <p>I booked a lifestyle shoot, and the photos exceeded my expectations. The team paid attention to every detail thank you Thoozhaa.</p>
+            
+        </div>
+        <div class="person">
+            <p>My experience at the Thoozhaa studio was fantastic from start to finish and the photos will be treasured forever thaks a lot.</p>
+            
+        </div>
+     </div>
+    <!-- black and white -->
+     <div class="baw-container">
+        <div class="baw-img">
+            <img src="./images/modify1.jpg" data-hover="./images/color1.jpg">
+            <img src="./images/modify2.jpg" data-hover="./images/color2.jpg">
+            <img src="./images/modify3.jpg" data-hover="./images/color3.jpg">
+        </div>
+        <div class="baw-img">
+            <img src="./images/modify.jpg" data-hover="./images/color4.jpg">
+            <img src="./images/modify5.jpg" data-hover="./images/color5.jpg">
+            <img src="./images/modify6.jpg" data-hover="./images/color6.jpg">
+        </div>
+        <div class="baw-img">
+            <img src="./images/modify7.jpg" data-hover="./images/color7.jpg">
+            <img src="./images/modify8.jpg" data-hover="./images/color8.jpg">
+            <img src="./images/modify9.jpg" data-hover="./images/color9.jpg">
+        </div>
+     </div>
+    <!-- footer -->
+    <div class="footer">
+        <div class="icon">
+            <a href="https://www.facebook.com/yourpage"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="https://www.instagram.com/thoozhaa"><i class="fa-brands fa-instagram"></i></a>
+            <a href="mailto:vjaigrylls@gmail.com"><i class="fa-solid fa-envelope"></i></a>
+        </div> 
+        <div class="info">
+            <p>Thoozhaa Studio Photography</p>
+            <p>Main road, Karkathi, Thiruvarur - 612203</p>
+            <p>+91 8940048067</p>
+            <p>vjaigrylls@gmail.com</p>
+        </div>
+        <div><p>Freeze The Time</p></div>     
+    </div>
+    <!-- chatbot -->
+    <!-- Chatbot Font -->
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+<!-- Chatbot HTML -->
+<button id="chat-toggle" onclick="toggleChat()">
+  <svg class="icon-chat" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 10H6v-2h12v2zm0-3H6V7h12v2z"/></svg>
+  <svg class="icon-close" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+</button>
+
+<div id="chat-window">
+  <div class="chat-header">
+    <div class="chat-avatar">📷</div>
+    <div class="chat-header-info">
+      <h4>Thoozhaa Studio</h4>
+      <span><span class="online-dot"></span>We reply instantly</span>
+    </div>
+  </div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-input-area">
+    <input type="text" id="userInput" placeholder="Type your question..." onkeydown="handleKey(event)" />
+    <button class="send-btn" onclick="sendMessage()">
+      <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+    </button>
+  </div>
+</div>
+
+
+ 
+<script src="script.js"></script>
+</body>
+</html>

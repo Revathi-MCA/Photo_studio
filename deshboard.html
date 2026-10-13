@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #f4f1ec;
+      --sidebar: #1c1c1e;
+      --sidebar-text: #a0a0a0;
+      --sidebar-active: #fff;
+      --accent: #c9a96e;
+      --card-bg: #ffffff;
+      --text: #1c1c1e;
+      --muted: #888;
+      --border: #e8e2d9;
+      --danger: #e05c5c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .sidebar {
+      width: 240px;
+      background: var(--sidebar);
+      color: var(--sidebar-text);
+      display: flex;
+      flex-direction: column;
+      padding: 28px 0;
+      height: 100vh;
+      position: fixed;
+      left: 0; top: 0;
+    }
+    .sidebar-brand {
+      text-align: center;
+      padding: 0 20px 28px;
+      border-bottom: 1px solid #2e2e30;
+    }
+    .sidebar-brand h4 {
+      font-family: 'Playfair Display', serif;
+      color: var(--accent);
+      font-size: 20px;
+      letter-spacing: 1px;
+    }
+    .sidebar-brand span { font-size: 11px; color: #555; letter-spacing: 2px; text-transform: uppercase; }
+    .sidebar ul { list-style: none; padding: 20px 0; flex: 1; }
+    .sidebar ul li a {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 24px;
+      color: var(--sidebar-text);
+      text-decoration: none;
+      font-size: 14px;
+      transition: 0.2s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar ul li a i { width: 18px; text-align: center; }
+    .sidebar ul li a:hover, .sidebar ul li a.active {
+      color: var(--sidebar-active);
+      background: #2a2a2c;
+      border-left-color: var(--accent);
+    }
+    .sidebar ul li a.logout { color: #e05c5c; }
+    .content {
+      margin-left: 240px;
+      padding: 32px;
+      width: calc(100% - 240px);
+      height: 100vh;
+      overflow-y: auto;
+    }
+    .page-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 28px;
+    }
+    .page-header h2 { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--text); }
+    .page-header span { font-size: 13px; color: var(--muted); }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+    .card {
+      background: var(--card-bg);
+      padding: 22px 20px;
+      border-radius: 14px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      display: flex; align-items: center; gap: 16px;
+    }
+    .card-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .card-icon.gold { background: #fdf3e3; color: var(--accent); }
+    .card-icon.blue { background: #e8f0fe; color: #4a7cf7; }
+    .card-icon.green { background: #e8f5e9; color: #4caf50; }
+    .card-icon.red { background: #fdecea; color: #e05c5c; }
+    .card-info h5 { font-size: 12px; color: var(--muted); font-weight: 400; text-transform: uppercase; letter-spacing: 1px; }
+    .card-info p { font-size: 24px; font-weight: 600; color: var(--text); margin-top: 2px; }
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 20px; color: var(--text);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-title .badge {
+      background: var(--accent); color: #fff;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px; padding: 2px 10px;
+      border-radius: 20px; font-weight: 500;
+    }
+    .table-wrap {
+      background: var(--card-bg);
+      border-radius: 14px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+      overflow: hidden;
+    }
+    .table-toolbar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .search-box {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 14px; width: 240px;
+    }
+    .search-box input {
+      border: none; background: transparent; outline: none;
+      font-size: 13px; color: var(--text); width: 100%;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .refresh-btn {
+      background: var(--accent); color: #fff; border: none;
+      padding: 8px 18px; border-radius: 8px; font-size: 13px;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      display: flex; align-items: center; gap: 6px; transition: 0.2s;
+    }
+    .refresh-btn:hover { background: #b8904f; }
+    table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+    thead th {
+      background: #fafafa; padding: 12px 18px; text-align: left;
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 1px; color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #fdf9f4; }
+    tbody td { padding: 14px 18px; color: var(--text); vertical-align: middle; }
+    .td-name { font-weight: 500; }
+    .td-email { color: var(--muted); font-size: 13px; }
+    .td-plan { max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted); }
+    .td-date-badge {
+      background: #f0ece4; color: var(--accent);
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 12px; font-weight: 500; white-space: nowrap;
+    }
+
+    /* ── Delete Button ── */
+    .delete-btn {
+      background: #fdecea;
+      color: var(--danger);
+      border: 1px solid #f5c6c6;
+      padding: 6px 14px;
+      border-radius: 7px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 6px;
+      font-family: 'DM Sans', sans-serif;
+      transition: 0.2s;
+      white-space: nowrap;
+    }
+    .delete-btn:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+    /* ── Confirm Modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.45);
+      z-index: 999;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: #fff; border-radius: 16px;
+      padding: 36px 32px; width: 360px;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+      animation: popIn 0.2s ease;
+    }
+    @keyframes popIn {
+      from { transform: scale(0.9); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .modal .modal-icon { font-size: 42px; color: var(--danger); margin-bottom: 16px; }
+    .modal h3 { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 8px; color: var(--text); }
+    .modal p { font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+    .modal-actions { display: flex; gap: 12px; justify-content: center; }
+    .btn-cancel {
+      padding: 10px 24px; border: 1px solid var(--border);
+      background: #fff; border-radius: 8px; font-size: 13px;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      color: var(--text); transition: 0.2s;
+    }
+    .btn-cancel:hover { background: var(--bg); }
+    .btn-confirm-delete {
+      padding: 10px 24px; border: none;
+      background: var(--danger); color: #fff;
+      border-radius: 8px; font-size: 13px;
+      cursor: pointer; font-family: 'DM Sans', sans-serif; transition: 0.2s;
+    }
+    .btn-confirm-delete:hover { background: #c94444; }
+
+    .table-loading, .table-empty {
+      text-align: center; padding: 48px;
+      color: var(--muted); font-size: 14px;
+    }
+    .table-loading i, .table-empty i { display: block; font-size: 32px; margin-bottom: 12px; color: #ccc; }
+
+    #uploadBtn {
+      padding: 10px 22px; background: var(--accent);
+      border: none; border-radius: 8px; color: white;
+      font-size: 14px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      display: flex; align-items: center; gap: 8px; transition: 0.2s;
+    }
+    #uploadBtn:hover { background: #b8904f; }
+    @media (max-width: 900px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+    /* ══════════════════════════════
+   TABLET (max-width: 900px)
+══════════════════════════════ */
+@media (max-width: 900px) {
+  .cards { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* ══════════════════════════════
+   TABLET (max-width: 768px)
+══════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Sidebar slides off screen */
+  body { overflow: auto; }
+
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+    z-index: 1000;
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  /* Dark overlay behind sidebar */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 999;
+  }
+  .sidebar-overlay.show { display: block; }
+
+  /* Content full width */
+  .content {
+    margin-left: 0;
+    width: 100%;
+    padding: 16px;
+    height: auto;
+  }
+
+  /* Page header with hamburger */
+  .page-header {
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .page-header h2 { font-size: 20px; }
+
+  /* Hamburger button */
+  .hamburger {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent);
+    border: none;
+    color: #fff;
+    width: 40px; height: 40px;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  /* Cards 2 columns */
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .card { padding: 14px 12px; gap: 10px; }
+  .card-icon { width: 38px; height: 38px; font-size: 16px; }
+  .card-info p { font-size: 20px; }
+  .card-info h5 { font-size: 10px; }
+
+  /* Table toolbar stacks */
+  .table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+  .search-box { width: 100%; }
+  .refresh-btn { justify-content: center; }
+
+  /* Table horizontal scroll */
+  .table-wrap { overflow-x: auto; }
+  table { min-width: 580px; }
+
+  /* Upload button */
+  #uploadBtn { padding: 8px 14px; font-size: 13px; }
+
+  /* Modal */
+  .modal { width: 90vw; padding: 28px 20px; }
+}
+
+/* ══════════════════════════════
+   MOBILE (max-width: 480px)
+══════════════════════════════ */
+@media (max-width: 480px) {
+  .content { padding: 12px; }
+  .page-header h2 { font-size: 17px; }
+  .cards { gap: 10px; }
+  .card { padding: 12px 10px; }
+  .card-info p { font-size: 18px; }
+  .section-title { font-size: 16px; }
+}
+  </style>
+</head>
+
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <h4>Thoozhaa</h4>
+      <span>Admin Panel</span>
+    </div>
+    <ul>
+      <li><a href="dashboard.html" class="active"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+      <li><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></li>
+      <li><a href="gallery.html"><i class="fa-solid fa-image"></i> Gallery</a></li>
+      <li><a href="service.html"><i class="fa-solid fa-layer-group"></i> Services</a></li>
+      <li><a href="shop.html"><i class="fa-solid fa-cart-shopping"></i> Shop</a></li>
+      <li><a href="contact.html"><i class="fa-solid fa-phone-volume"></i> Contact</a></li>
+      <li><a href="preorder.html"><i class="fa-solid fa-calendar-plus"></i> Pre-Orders</a></li>
+      <li><a href="postorder.html"><i class="fa-solid fa-calendar-check"></i> Post-Orders</a></li>
+      <li><a href="#" class="logout"><i class="fa fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- Content -->
+  <main class="content">
+    <div class="page-header">
+      <button class="hamburger" onclick="openSidebar()">
+  <i class="fa-solid fa-bars"></i>
+</button>
+      <div>
+        <h2>Dashboard Overview</h2>
+        <span id="currentDate"></span>
+      </div>
+      <button id="uploadBtn" onclick="window.location.href='upload.html'">
+        <i class="fa-solid fa-upload"></i> Upload Photo
+      </button>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon gold"><i class="fa-solid fa-envelope-open-text"></i></div>
+        <div class="card-info"><h5>Enquiries</h5><p id="enquiryCount">—</p></div>
+      </div>
+      <div class="card">
+        <div class="card-icon blue"><i class="fa-solid fa-cart-shopping"></i></div>
+        <div class="card-info"><h5>Products</h5><p>12</p></div>
+      </div>
+      <div class="card">
+        <div class="card-icon green"><i class="fa-solid fa-image"></i></div>
+        <div class="card-info"><h5>Gallery</h5><p id="galleryCount">—</p></div>
+      </div>
+      <div class="card">
+        <div class="card-icon red"><i class="fa-solid fa-layer-group"></i></div>
+        <div class="card-info"><h5>Services</h5><p>9</p></div>
+      </div>
+    </div>
+
+    <div class="section-title">
+      Contact Enquiries
+      <span class="badge" id="tableBadge">0</span>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-toolbar">
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="searchInput" placeholder="Search by name, email..." oninput="filterTable()">
+        </div>
+        <button class="refresh-btn" onclick="loadContacts()">
+          <i class="fa-solid fa-rotate-right"></i> Refresh
+        </button>
+      </div>
+      <div id="tableContainer">
+        <div class="table-loading">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          Loading enquiries...
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Delete Confirm Modal -->
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+      <div class="modal-icon"><i class="fa-solid fa-trash-can"></i></div>
+      <h3>Delete Enquiry?</h3>
+      <p>This will permanently remove this record from the database. This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="btn-confirm-delete" onclick="confirmDelete()">
+          <i class="fa-solid fa-trash"></i> Yes, Delete
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-IN', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    let allContacts = [];
+    let deleteId = null;
+
+    async function loadContacts() {
+      document.getElementById('tableContainer').innerHTML = `
+        <div class="table-loading">
+          <i class="fa-solid fa-spinner fa-spin"></i>
+          Loading enquiries...
+        </div>`;
+      try {
+        const res = await fetch('http://localhost:5000/api/contacts');
+        const data = await res.json();
+        allContacts = data;
+        document.getElementById('enquiryCount').textContent = data.length;
+        document.getElementById('tableBadge').textContent = data.length;
+        renderTable(data);
+      } catch (err) {
+        document.getElementById('tableContainer').innerHTML = `
+          <div class="table-empty">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Could not load data. Make sure the server is running on port 5000.
+          </div>`;
+      }
+    }
+
+    async function loadGalleryCount() {
+      try {
+        const res = await fetch('http://localhost:5000/api/images');
+        const data = await res.json();
+        document.getElementById('galleryCount').textContent = data.length;
+      } catch (e) {}
+    }
+
+    function renderTable(contacts) {
+      if (contacts.length === 0) {
+        document.getElementById('tableContainer').innerHTML = `
+          <div class="table-empty">
+            <i class="fa-regular fa-folder-open"></i>
+            No enquiries found yet.
+          </div>`;
+        return;
+      }
+
+      const rows = contacts.map((c, i) => {
+        const submittedDate = c.submittedAt
+          ? new Date(c.submittedAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' })
+          : '—';
+        return `
+          <tr id="row-${c._id}">
+            <td>${i + 1}</td>
+            <td class="td-name">${c.name || '—'}</td>
+            <td class="td-email">${c.email || '—'}</td>
+            <td>${c.phone || '—'}</td>
+            <td><span class="td-date-badge">${c.date || '—'}</span></td>
+            <td class="td-plan" title="${c.plan || ''}">${c.plan || '—'}</td>
+            <td>${submittedDate}</td>
+            <td>
+              <button class="delete-btn" onclick="openModal('${c._id}')">
+                <i class="fa-solid fa-trash"></i> Delete
+              </button>
+            </td>
+          </tr>`;
+      }).join('');
+
+      document.getElementById('tableContainer').innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>Name</th><th>Email</th><th>Phone</th>
+              <th>Wedding Date</th><th>Plan</th><th>Submitted</th><th>Action</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    }
+
+    // ── Open modal, store ID ──
+    function openModal(id) {
+      deleteId = id;
+      document.getElementById('deleteModal').classList.add('show');
+    }
+
+    // ── Close modal ──
+    function closeModal() {
+      deleteId = null;
+      document.getElementById('deleteModal').classList.remove('show');
+    }
+
+    // ── DELETE from backend + frontend ──
+    async function confirmDelete() {
+      if (!deleteId) return;
+      try {
+        const res = await fetch(`http://localhost:5000/api/contacts/${deleteId}`, {
+          method: 'DELETE'
+        });
+        const data = await res.json();
+        if (data.success) {
+          // Remove from local array
+          allContacts = allContacts.filter(c => c._id !== deleteId);
+          // Update counts
+          document.getElementById('enquiryCount').textContent = allContacts.length;
+          document.getElementById('tableBadge').textContent = allContacts.length;
+          // Re-render
+          renderTable(allContacts);
+        } else {
+          alert('Delete failed. Try again.');
+        }
+      } catch (err) {
+        alert('Server error. Make sure backend is running.');
+      }
+      closeModal();
+    }
+
+    function filterTable() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const filtered = allContacts.filter(c =>
+        (c.name && c.name.toLowerCase().includes(query)) ||
+        (c.email && c.email.toLowerCase().includes(query)) ||
+        (c.phone && c.phone.includes(query))
+      );
+      renderTable(filtered);
+    }
+
+    // Close modal when clicking outside
+    document.getElementById('deleteModal').addEventListener('click', function(e) {
+      if (e.target === this) closeModal();
+    });
+
+    loadContacts();
+    loadGalleryCount();
+
+    function openSidebar() {
+  document.querySelector('.sidebar').classList.add('open');
+  document.getElementById('sidebarOverlay').classList.add('show');
+}
+function closeSidebar() {
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+  </script>
+
+</body>
+</html>

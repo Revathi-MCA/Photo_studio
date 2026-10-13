@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pre-Orders | Thoozhaa Admin</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f1ec; --sidebar: #1c1c1e; --sidebar-text: #a0a0a0;
+      --sidebar-active: #fff; --accent: #c9a96e; --card-bg: #ffffff;
+      --text: #1c1c1e; --muted: #888; --border: #e8e2d9;
+      --danger: #e05c5c; --success: #4caf50; --wa: #25d366;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); display: flex; height: 100vh; overflow: hidden; }
+
+    /* ── Sidebar ── */
+    .sidebar { width: 240px; background: var(--sidebar); color: var(--sidebar-text); display: flex; flex-direction: column; padding: 28px 0; height: 100vh; position: fixed; left: 0; top: 0; z-index: 100; }
+    .sidebar-brand { text-align: center; padding: 0 20px 28px; border-bottom: 1px solid #2e2e30; }
+    .sidebar-brand h4 { font-family: 'Playfair Display', serif; color: var(--accent); font-size: 20px; letter-spacing: 1px; }
+    .sidebar-brand span { font-size: 11px; color: #555; letter-spacing: 2px; text-transform: uppercase; }
+    .sidebar ul { list-style: none; padding: 20px 0; flex: 1; }
+    .sidebar ul li a { display: flex; align-items: center; gap: 12px; padding: 12px 24px; color: var(--sidebar-text); text-decoration: none; font-size: 14px; transition: 0.2s; border-left: 3px solid transparent; }
+    .sidebar ul li a i { width: 18px; text-align: center; }
+    .sidebar ul li a:hover, .sidebar ul li a.active { color: var(--sidebar-active); background: #2a2a2c; border-left-color: var(--accent); }
+    .sidebar ul li a.logout { color: #e05c5c; }
+
+    /* ── Layout ── */
+    .content { margin-left: 240px; padding: 32px; width: calc(100% - 240px); height: 100vh; overflow-y: auto; }
+    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; gap: 12px; flex-wrap: wrap; }
+    .page-header h2 { font-family: 'Playfair Display', serif; font-size: 26px; color: var(--text); }
+    .page-header span { font-size: 13px; color: var(--muted); }
+    .hamburger { display: none; align-items: center; justify-content: center; background: var(--accent); border: none; color: #fff; width: 40px; height: 40px; border-radius: 8px; font-size: 18px; cursor: pointer; }
+
+    /* ── WhatsApp Banner ── */
+    .wa-banner { background: #f0fdf4; border: 1.5px solid #bbf7d0; border-radius: 14px; padding: 16px 22px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+    .wa-banner-left { display: flex; align-items: center; gap: 14px; }
+    .wa-icon-box { width: 46px; height: 46px; background: var(--wa); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; flex-shrink: 0; }
+    .wa-banner-text h4 { font-size: 14px; font-weight: 600; color: #14532d; margin-bottom: 3px; }
+    .wa-banner-text p { font-size: 12.5px; color: #166534; line-height: 1.5; }
+    .wa-banner-text p span { font-weight: 600; }
+    .btn-send-now { background: var(--wa); color: #fff; border: none; padding: 10px 20px; border-radius: 9px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 8px; transition: background 0.2s; white-space: nowrap; flex-shrink: 0; }
+    .btn-send-now:hover { background: #1da855; }
+    .btn-send-now:disabled { background: #86efac; cursor: not-allowed; }
+
+    /* ── Info Banner ── */
+    .info-banner { background: linear-gradient(135deg,#fdf3e3,#fef9f0); border: 1.5px solid #f0dbb8; border-radius: 12px; padding: 14px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; font-size: 13.5px; color: #7a5c2e; }
+    .info-banner i { font-size: 18px; color: var(--accent); flex-shrink: 0; }
+
+    /* ── Form ── */
+    .form-card { background: var(--card-bg); border-radius: 16px; box-shadow: 0 1px 8px rgba(0,0,0,0.07); padding: 28px 28px 24px; margin-bottom: 30px; }
+    .form-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--text); margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    .form-title i { color: var(--accent); font-size: 18px; }
+    .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
+    .form-group input, .form-group select, .form-group textarea { border: 1.5px solid var(--border); background: var(--bg); border-radius: 9px; padding: 10px 14px; font-size: 14px; font-family: 'DM Sans', sans-serif; color: var(--text); outline: none; transition: 0.2s; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--accent); background: #fff; }
+    .form-group textarea { resize: vertical; min-height: 72px; }
+    .form-actions { margin-top: 20px; display: flex; gap: 12px; justify-content: flex-end; }
+    .btn-add { background: var(--accent); color: #fff; border: none; padding: 11px 28px; border-radius: 9px; font-size: 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+    .btn-add:hover { background: #b8904f; }
+    .btn-reset { background: #f0ece4; color: var(--muted); border: none; padding: 11px 20px; border-radius: 9px; font-size: 14px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: 0.2s; }
+    .btn-reset:hover { background: #e8e2d9; }
+
+    /* ── Section title ── */
+    .section-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+    .section-title .badge { background: var(--accent); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 2px 10px; border-radius: 20px; font-weight: 500; }
+
+    /* ── Table ── */
+    .table-wrap { background: var(--card-bg); border-radius: 14px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); overflow: hidden; }
+    .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border); }
+    .search-box { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 8px 14px; width: 260px; }
+    .search-box input { border: none; background: transparent; outline: none; font-size: 13px; color: var(--text); width: 100%; font-family: 'DM Sans', sans-serif; }
+    .refresh-btn { background: var(--accent); color: #fff; border: none; padding: 8px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 6px; transition: 0.2s; }
+    .refresh-btn:hover { background: #b8904f; }
+
+    /* Table scrolls horizontally, action column is STICKY RIGHT */
+    .table-scroll { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th { background: #fafafa; padding: 11px 12px; text-align: left; font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.15s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #fdf9f4; }
+    tbody tr.reminder-due { background: #f0fdf4 !important; }
+    tbody tr.reminder-due:hover { background: #dcfce7 !important; }
+    tbody td { padding: 11px 12px; color: var(--text); vertical-align: middle; white-space: nowrap; }
+
+    /* Sticky action column */
+    th.sticky, td.sticky {
+      position: sticky;
+      right: 0;
+      background: #fafafa;
+      box-shadow: -3px 0 8px rgba(0,0,0,0.06);
+      z-index: 2;
+    }
+    td.sticky { background: #fff; }
+    tbody tr:hover td.sticky { background: #fdf9f4; }
+    tbody tr.reminder-due td.sticky { background: #f0fdf4; }
+
+    .td-name { font-weight: 500; }
+    .td-date-badge { background: #f0ece4; color: var(--accent); padding: 3px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 500; }
+    .days-badge { padding: 3px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 500; }
+    .days-ok    { background: #e8f5e9; color: #388e3c; }
+    .days-soon  { background: #fff3e0; color: #f57c00; }
+    .days-2     { background: #dcfce7; color: #14532d; font-weight: 700; border: 1.5px solid #86efac; }
+    .days-today { background: #fce4ec; color: #c62828; font-weight: 700; }
+    .status-badge { padding: 3px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 500; }
+    .status-pending   { background: #fff8e1; color: #f59e0b; }
+    .status-confirmed { background: #e8f5e9; color: #4caf50; }
+    .status-cancelled { background: #fdecea; color: #e05c5c; }
+    .rem-badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 500; white-space: nowrap; }
+    .rem-sent    { background: #dcfce7; color: #14532d; }
+    .rem-due     { background: #fef9c3; color: #854d0e; border: 1.5px solid #fde047; }
+    .rem-pending { background: #f5f5f5; color: #999; }
+
+    .delete-btn { background: #fdecea; color: var(--danger); border: 1px solid #f5c6c6; padding: 6px 12px; border-radius: 7px; font-size: 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-family: 'DM Sans', sans-serif; transition: 0.2s; white-space: nowrap; }
+    .delete-btn:hover { background: var(--danger); color: #fff; border-color: var(--danger); }
+
+    .table-loading, .table-empty { text-align: center; padding: 48px; color: var(--muted); font-size: 14px; }
+    .table-loading i, .table-empty i { display: block; font-size: 32px; margin-bottom: 12px; color: #ccc; }
+
+    /* ── Modal ── */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 999; align-items: center; justify-content: center; }
+    .modal-overlay.show { display: flex; }
+    .modal { background: #fff; border-radius: 16px; padding: 36px 32px; width: 360px; text-align: center; box-shadow: 0 8px 40px rgba(0,0,0,0.18); animation: popIn 0.2s ease; }
+    @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .modal .modal-icon { font-size: 42px; color: var(--danger); margin-bottom: 16px; }
+    .modal h3 { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 8px; color: var(--text); }
+    .modal p  { font-size: 13px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+    .modal-actions { display: flex; gap: 12px; justify-content: center; }
+    .btn-cancel { padding: 10px 24px; border: 1px solid var(--border); background: #fff; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--text); transition: 0.2s; }
+    .btn-cancel:hover { background: var(--bg); }
+    .btn-confirm-delete { padding: 10px 24px; border: none; background: var(--danger); color: #fff; border-radius: 8px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: 0.2s; }
+    .btn-confirm-delete:hover { background: #c94444; }
+
+    /* ── Toast ── */
+    .toast { position: fixed; top: 24px; right: 24px; background: #1c1c1e; color: #fff; padding: 14px 22px; border-radius: 10px; font-size: 13px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); transform: translateY(-80px); opacity: 0; transition: all 0.35s cubic-bezier(0.4,0,0.2,1); z-index: 9999; min-width: 220px; }
+    .toast.show { transform: translateY(0); opacity: 1; }
+    .toast.success i { color: var(--success); }
+    .toast.error   i { color: var(--danger); }
+    .toast.wa      i { color: var(--wa); }
+
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+    .sidebar-overlay.show { display: block; }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      body { overflow: auto; }
+      .sidebar { transform: translateX(-100%); transition: transform 0.3s; z-index: 1000; }
+      .sidebar.open { transform: translateX(0); }
+      .content { margin-left: 0; width: 100%; padding: 16px; height: auto; }
+      .hamburger { display: flex; }
+      .form-grid { grid-template-columns: 1fr 1fr; }
+      .table-toolbar { flex-direction: column; align-items: stretch; gap: 10px; }
+      .search-box { width: 100%; }
+      .modal { width: 90vw; padding: 28px 20px; }
+      .wa-banner { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 480px) { .form-grid { grid-template-columns: 1fr; } .content { padding: 12px; } }
+  </style>
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+<nav class="sidebar">
+  <div class="sidebar-brand"><h4>Thoozhaa</h4><span>Admin Panel</span></div>
+  <ul>
+    <li><a href="deshboard.html"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+    <li><a href="index.html"><i class="fa-solid fa-house"></i> Home</a></li>
+    <li><a href="gallery.html"><i class="fa-solid fa-image"></i> Gallery</a></li>
+    <li><a href="service.html"><i class="fa-solid fa-layer-group"></i> Services</a></li>
+    <li><a href="shop.html"><i class="fa-solid fa-cart-shopping"></i> Shop</a></li>
+    <li><a href="preorder.html" class="active"><i class="fa-solid fa-calendar-plus"></i> Pre-Orders</a></li>
+    <li><a href="postorder.html"><i class="fa-solid fa-calendar-check"></i> Post-Orders</a></li>
+    <li><a href="contact.html"><i class="fa-solid fa-phone-volume"></i> Contact</a></li>
+    <li><a href="#" class="logout"><i class="fa fa-sign-out-alt"></i> Logout</a></li>
+  </ul>
+</nav>
+
+<main class="content">
+  <div class="page-header">
+    <button class="hamburger" onclick="openSidebar()"><i class="fa-solid fa-bars"></i></button>
+    <div><h2>Pre-Orders</h2><span id="currentDate"></span></div>
+  </div>
+
+  <!-- WhatsApp Banner -->
+  <div class="wa-banner">
+    <div class="wa-banner-left">
+      <div class="wa-icon-box"><i class="fa-brands fa-whatsapp"></i></div>
+      <div class="wa-banner-text">
+        <h4>WhatsApp Reminder — Auto Mode Active</h4>
+        <p>Fires daily at <span>8:00 AM IST</span>. Photographer gets a WhatsApp alert 2 days before each event. Last triggered: <span id="lastChecked">—</span></p>
+      </div>
+    </div>
+    <button class="btn-send-now" id="sendNowBtn" onclick="triggerReminder()">
+      <i class="fa-brands fa-whatsapp"></i> Send Now
+    </button>
+  </div>
+
+  <!-- Info Banner -->
+  <div class="info-banner">
+    <i class="fa-solid fa-circle-info"></i>
+    <span>Bookings for <strong>future dates</strong> appear here. Once the event date passes, they <strong>automatically move to Post-Orders</strong> — no manual action needed.</span>
+  </div>
+
+  <!-- Form -->
+  <div class="form-card">
+    <div class="form-title"><i class="fa-solid fa-circle-plus"></i> Add New Booking</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Client Name *</label><input type="text" id="clientName" placeholder="e.g. Priya Ramesh" /></div>
+      <div class="form-group"><label>Phone *</label><input type="tel" id="phone" placeholder="+91 9XXXXXXXXX" /></div>
+      <div class="form-group"><label>Email</label><input type="email" id="email" placeholder="client@email.com" /></div>
+      <div class="form-group"><label>Event Date * (future only)</label><input type="date" id="eventDate" /></div>
+      <div class="form-group"><label>Event Type</label>
+        <select id="eventType">
+          <option value="">Select Type</option>
+          <option>Wedding</option><option>Engagement</option><option>Baby Shower</option>
+          <option>Birthday</option><option>Reception</option><option>Other</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Package / Plan</label><input type="text" id="plan" placeholder="e.g. Gold Bridal Package" /></div>
+      <div class="form-group"><label>Advance Paid (₹)</label><input type="number" id="advance" placeholder="e.g. 5000" min="0" /></div>
+      <div class="form-group"><label>Total Amount (₹)</label><input type="number" id="totalAmount" placeholder="e.g. 25000" min="0" /></div>
+      <div class="form-group"><label>Status</label>
+        <select id="status">
+          <option value="Pending">Pending</option>
+          <option value="Confirmed">Confirmed</option>
+          <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+      <div class="form-group full"><label>Notes / Remarks</label><textarea id="notes" placeholder="Venue details, special requirements..."></textarea></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-reset" onclick="resetForm()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+      <button class="btn-add" onclick="addOrder()"><i class="fa-solid fa-plus"></i> Add Booking</button>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="section-title">Upcoming Orders <span class="badge" id="tableBadge">0</span></div>
+  <div class="table-wrap">
+    <div class="table-toolbar">
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" id="searchInput" placeholder="Search by name, phone, event..." oninput="filterTable()">
+      </div>
+      <button class="refresh-btn" onclick="loadOrders()"><i class="fa-solid fa-rotate-right"></i> Refresh</button>
+    </div>
+    <div id="tableContainer"><div class="table-loading"><i class="fa-solid fa-spinner fa-spin"></i>Loading...</div></div>
+  </div>
+</main>
+
+<!-- Delete Modal -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <div class="modal-icon"><i class="fa-solid fa-trash-can"></i></div>
+    <h3>Delete Booking?</h3>
+    <p>This will permanently remove this record from the database. This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm-delete" onclick="confirmDelete()"><i class="fa-solid fa-trash"></i> Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="fa-solid fa-circle-check"></i><span id="toastMsg"></span></div>
+
+<script>
+  const API     = 'http://localhost:5000/api/orders';
+  let allOrders = [];
+  let deleteId  = null;
+
+  document.getElementById('currentDate').textContent = new Date().toLocaleDateString('en-IN', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+  document.getElementById('eventDate').min = new Date().toISOString().split('T')[0];
+
+  const lc = localStorage.getItem('wa_last_triggered');
+  if (lc) document.getElementById('lastChecked').textContent = lc;
+
+  // ── Toast ──────────────────────────────────────────────
+  function showToast(msg, type = 'success') {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.className = `toast ${type} show`;
+    const icons = { success: 'fa-solid fa-circle-check', error: 'fa-solid fa-circle-xmark', wa: 'fa-brands fa-whatsapp' };
+    t.querySelector('i').className = icons[type] || icons.success;
+    setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  function daysLeft(eventDate) {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const ev    = new Date(eventDate); ev.setHours(0,0,0,0);
+    return Math.round((ev - today) / 86400000);
+  }
+
+  // ── Manual reminder trigger ────────────────────────────
+  async function triggerReminder() {
+    const btn = document.getElementById('sendNowBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending...';
+    try {
+      const res  = await fetch('http://localhost:5000/api/orders/send-reminders', { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        const msg = data.sent > 0 ? `${data.sent} reminder(s) sent!` : 'No events in 2 days.';
+        showToast(msg, data.sent > 0 ? 'wa' : 'success');
+        const now = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        localStorage.setItem('wa_last_triggered', `Today at ${now}`);
+        document.getElementById('lastChecked').textContent = `Today at ${now}`;
+        loadOrders();
+      } else { showToast('Failed: ' + (data.error || 'Unknown'), 'error'); }
+    } catch { showToast('Could not reach server.', 'error'); }
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-brands fa-whatsapp"></i> Send Now';
+  }
+
+  // ── Load orders ────────────────────────────────────────
+  async function loadOrders() {
+    document.getElementById('tableContainer').innerHTML =
+      `<div class="table-loading"><i class="fa-solid fa-spinner fa-spin"></i>Loading...</div>`;
+    try {
+      const res  = await fetch(`${API}?type=pre`);
+      const data = await res.json();
+      allOrders  = data;
+      document.getElementById('tableBadge').textContent = data.length;
+      renderTable(data);
+    } catch {
+      document.getElementById('tableContainer').innerHTML =
+        `<div class="table-empty"><i class="fa-solid fa-triangle-exclamation"></i>Could not load. Make sure server is running on port 5000.</div>`;
+    }
+  }
+
+  // ── Render table ───────────────────────────────────────
+  function renderTable(orders) {
+    if (!orders.length) {
+      document.getElementById('tableContainer').innerHTML =
+        `<div class="table-empty"><i class="fa-regular fa-folder-open"></i>No upcoming orders found.</div>`;
+      return;
+    }
+
+    const statusCls = { Pending: 'status-pending', Confirmed: 'status-confirmed', Cancelled: 'status-cancelled' };
+
+    const rows = orders.map((o, i) => {
+      const dl = daysLeft(o.eventDate);
+
+      // Days badge
+      let dlClass = 'days-ok', dlText = `${dl} day${dl===1?'':'s'} left`;
+      if      (dl === 0) { dlClass = 'days-today'; dlText = 'Today!'; }
+      else if (dl === 2) { dlClass = 'days-2';     dlText = '2 days'; }
+      else if (dl <= 7)  { dlClass = 'days-soon'; }
+      else if (dl < 0)   { dlText = '—'; }
+
+      // Reminder badge
+      let remBadge;
+      if (o.reminderSent) {
+        const d = o.reminderSentAt ? new Date(o.reminderSentAt).toLocaleDateString('en-IN',{day:'2-digit',month:'short'}) : '';
+        remBadge = `<span class="rem-badge rem-sent"><i class="fa-brands fa-whatsapp"></i> Sent ${d}</span>`;
+      } else if (dl === 2) {
+        remBadge = `<span class="rem-badge rem-due"><i class="fa-solid fa-bell"></i> Due today</span>`;
+      } else {
+        remBadge = `<span class="rem-badge rem-pending"><i class="fa-regular fa-clock"></i> Pending</span>`;
+      }
+
+      const rowCls = (dl === 2 && !o.reminderSent) ? 'reminder-due' : '';
+
+      return `<tr class="${rowCls}">
+        <td>${i+1}</td>
+        <td class="td-name">${o.clientName||'—'}</td>
+        <td>${o.phone||'—'}</td>
+        <td><span class="td-date-badge">${o.eventDate?new Date(o.eventDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'}):'—'}</span></td>
+        <td><span class="days-badge ${dlClass}">${dlText}</span></td>
+        <td>${o.eventType||'—'}</td>
+        <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;color:var(--muted)">${o.plan||'—'}</td>
+        <td>₹${o.advance?Number(o.advance).toLocaleString('en-IN'):'0'}</td>
+        <td>₹${o.totalAmount?Number(o.totalAmount).toLocaleString('en-IN'):'0'}</td>
+        <td><span class="status-badge ${statusCls[o.status]||'status-pending'}">${o.status||'Pending'}</span></td>
+        <td>${remBadge}</td>
+        <td class="sticky">
+          <button class="delete-btn" onclick="openModal('${o._id}')">
+            <i class="fa-solid fa-trash"></i> Delete
+          </button>
+        </td>
+      </tr>`;
+    }).join('');
+
+    document.getElementById('tableContainer').innerHTML = `
+      <div class="table-scroll">
+        <table>
+          <thead><tr>
+            <th>#</th>
+            <th>Client</th>
+            <th>Phone</th>
+            <th>Event Date</th>
+            <th>Days Left</th>
+            <th>Type</th>
+            <th>Package</th>
+            <th>Advance</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th><i class="fa-brands fa-whatsapp" style="color:#25d366"></i> Reminder</th>
+            <th class="sticky">Action</th>
+          </tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }
+
+  // ── Add order ──────────────────────────────────────────
+  async function addOrder() {
+    const clientName = document.getElementById('clientName').value.trim();
+    const phone      = document.getElementById('phone').value.trim();
+    const eventDate  = document.getElementById('eventDate').value;
+    if (!clientName || !phone || !eventDate) { showToast('Fill Client Name, Phone & Event Date','error'); return; }
+    const payload = {
+      clientName, phone,
+      email:       document.getElementById('email').value.trim(),
+      eventDate,
+      eventType:   document.getElementById('eventType').value,
+      plan:        document.getElementById('plan').value.trim(),
+      advance:     document.getElementById('advance').value || 0,
+      totalAmount: document.getElementById('totalAmount').value || 0,
+      status:      document.getElementById('status').value,
+      notes:       document.getElementById('notes').value.trim(),
+    };
+    try {
+      const res  = await fetch(API, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload) });
+      const data = await res.json();
+      if (data._id) { showToast('Booking added!'); resetForm(); loadOrders(); }
+      else showToast('Failed to add','error');
+    } catch { showToast('Server error','error'); }
+  }
+
+  function resetForm() {
+    ['clientName','phone','email','eventDate','plan','advance','totalAmount','notes']
+      .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.getElementById('eventType').value = '';
+    document.getElementById('status').value    = 'Pending';
+  }
+
+  function filterTable() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    renderTable(allOrders.filter(o =>
+      (o.clientName||'').toLowerCase().includes(q) ||
+      (o.phone||'').includes(q) ||
+      (o.eventType||'').toLowerCase().includes(q) ||
+      (o.plan||'').toLowerCase().includes(q)
+    ));
+  }
+
+  function openModal(id) { deleteId = id; document.getElementById('deleteModal').classList.add('show'); }
+  function closeModal()  { deleteId = null; document.getElementById('deleteModal').classList.remove('show'); }
+
+  async function confirmDelete() {
+    if (!deleteId) return;
+    try {
+      const res  = await fetch(`${API}/${deleteId}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (data.success) {
+        allOrders = allOrders.filter(o => o._id !== deleteId);
+        document.getElementById('tableBadge').textContent = allOrders.length;
+        renderTable(allOrders);
+        showToast('Order deleted.');
+      } else showToast('Delete failed.','error');
+    } catch { showToast('Server error.','error'); }
+    closeModal();
+  }
+
+  document.getElementById('deleteModal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+  function openSidebar()  { document.querySelector('.sidebar').classList.add('open');    document.getElementById('sidebarOverlay').classList.add('show'); }
+  function closeSidebar() { document.querySelector('.sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('show'); }
+
+  loadOrders();
+</script>
+</body>
+</html>
